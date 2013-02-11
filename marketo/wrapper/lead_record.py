@@ -5,6 +5,12 @@ class LeadRecord:
     def __init__(self):
         self.attributes = {}
 
+    def __str__(self):
+        return "Lead (%s - %s)" % (self.id, self.email)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 def unwrap(xml):
     lead = LeadRecord()
