@@ -4,7 +4,7 @@ VERSION = '0.0.6'
 import requests
 import auth
 
-from marketo.wrapper import get_lead, get_lead_activity
+from marketo.wrapper import get_lead, get_lead_activity, request_campaign, sync_lead
 
 
 class Client:
@@ -32,7 +32,8 @@ class Client:
                           'xmlns:wsdl="http://www.marketo.com/mktows/" ' +
                           'xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" ' +
                           'xmlns:ins0="http://www.marketo.com/mktows/" ' +
-                          'xmlns:ns1="http://www.marketo.com/mktows/">' +
+                          'xmlns:ns1="http://www.marketo.com/mktows/" ' +
+                          'xmlns:mkt="http://www.marketo.com/mktows/">' +
                 auth.header(self.user_id, self.encryption_key) +
                 '<env:Body>' +
                     body +
@@ -70,5 +71,37 @@ class Client:
         response = self.request(body)
         if response.status_code == 200:
             return get_lead_activity.unwrap(response)
+        else:
+            raise Exception(response.text)
+
+    def request_campaign(self, campaign=None, lead=None):
+
+        if not campaign or not isinstance(campaign, (str, unicode)):
+            raise ValueError('Must supply campaign id as a non empty string.')
+
+        if not lead or not isinstance(lead, (str, unicode)):
+            raise ValueError('Must supply lead id as a non empty string.')
+
+        body = request_campaign.wrap(campaign, lead)
+
+        response = self.request(body)
+        if response.status_code == 200:
+            return True
+        else:
+            raise Exception(response.text)
+
+    def sync_lead(self, email=None, attributes=None):
+
+        if not email or not isinstance(email, (str, unicode)):
+            raise ValueError('Must supply lead id as a non empty string.')
+
+        if not attributes or not isinstance(attributes, tuple):
+            raise ValueError('Must supply attributes as a non empty tuple.')
+
+        body = sync_lead.wrap(email, attributes)
+
+        response = self.request(body)
+        if response.status_code == 200:
+            return sync_lead.unwrap(response)
         else:
             raise Exception(response.text)
