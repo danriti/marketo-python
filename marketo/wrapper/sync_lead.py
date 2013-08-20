@@ -25,6 +25,7 @@ def wrap(email=None, attributes=None):
 
 
 def unwrap(response):
-    root = ET.fromstring(response.text)
+    encoded_text = response.text.encode('utf8')
+    root = ET.fromstring(encoded_text)
     lead_record_xml = root.find('.//leadRecord')
     return lead_record.unwrap(lead_record_xml)
